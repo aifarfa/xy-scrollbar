@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="../bower_components/angular/angular.min.js"></script>
+    <script src="../src/xy-scroll.js"></script>
+    <script src="sample.js"></script>
+    <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../src/xy-scroll.css" rel="stylesheet" />
+    <link href="styles.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="container" ng-app="xyApp" ng-controller="xyCtrl as ctrl">
+        <h2>dragable content with fixed column</h2>
+        <p>try drag the green area</p>
+        <ul>
+            <li>mouse wheel: scroll vertical Y-axis</li>
+            <li>SHIFT + mouse wheel: scroll horizontal X-axis</li>
+        </ul>
+        <div class="row">
+            <div class="col-md-12 span12">
+                <div id="target" xy-scroll x="ctrl.x" y="ctrl.y" drag-x="true">
+                    <div class="xy-corner">
+                        <div class="text-center">item name</div>
+                    </div>
+                    <div class="xy-header-left">
+                        <table class="table fixed">
+                            <colgroup>
+                                <col class="col-sm" />
+                            </colgroup>
+                            <tbody>
+                                <tr ng-repeat="h in ctrl.stuff track by $index">
+                                    <th class="text-center" ng-bind="h.name"></th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="xy-header-top">
+                        <table class="table fixed">
+                            <colgroup>
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                            </colgroup>
+                            <tr>
+                                <th ng-repeat="col in ctrl.fields">
+                                    <div class="text-center" ng-bind="col"></div>
+                                </th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="xy-content">
+                        <table class="table fixed">
+                            <colgroup>
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                                <col class="col-sm" />
+                            </colgroup>
+                            <tr ng-repeat="item in ctrl.stuff track by $index">
+                                <td ng-bind="item.0"></td>
+                                <td ng-bind="item.1"></td>
+                                <td ng-bind="item.2"></td>
+                                <td ng-bind="item.3"></td>
+                                <td ng-bind="item.4"></td>
+                                <td ng-bind="item.5"></td>
+                                <td ng-bind="item.6"></td>
+                                <td ng-bind="item.7"></td>
+                                <td ng-bind="item.8"></td>
+                                <td ng-bind="item.9"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ctrl info -->
+        <div class="row">
+            <div class="col-sm-2 form-group span2">
+                <lable class="control-label">position-X:</lable>
+                <input class="form-control input-sm input-small" ng-model="ctrl.x" type="text" />
+            </div>
+            <div class="col-sm-2 form-group span2">
+                <lable class="control-label">position-Y:</lable>
+                <input class="form-control input-sm input-small" ng-model="ctrl.y" type="text" />
+            </div>
+        </div>
+        <p>footer content, angular ctrl status: {{ctrl.status}}</p>
+    </div>
+</body>
+
+</html>

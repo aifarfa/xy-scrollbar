@@ -1,0 +1,29 @@
+
+#target {
+  width: 640px;
+}
+#target .xy-header-top {
+  height: 37px;
+}
+#target .xy-header-top .table {
+  background: #fafafa;
+}
+#target .xy-corner div {
+  background: #dadada;
+  padding: 8px;
+}
+#target .fixed {
+  table-layout: fixed;
+  /* width: 100%; */
+}
+#target .fixed .col-sm {
+  width: 100px;
+}
+#target .fixed td,
+#target .fixed th {
+  vertical-align: top;
+  width: 100px;
+}
+#target .fixed th {
+  border-bottom: 0 none;
+}

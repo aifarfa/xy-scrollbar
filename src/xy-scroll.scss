@@ -1,0 +1,97 @@
+$header-height: 37px;
+$sidebar-width: 25%;
+$inner-width: 75%;
+$inner-height: 250px;
+$scroll-bar-size: 5px;
+$outer-width: 640px;
+$scroll-bar-color: #000;
+$scroll-bar-rgba: rgba(0, 0, 0, 0);
+$bar-color: #aaa;
+$bar-rgba: rgba(100, 100, 100, 0.5);
+$bar-radius: 2px;
+
+.xy-outer {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  //width: $outer-width;
+}
+
+.xy-inner {
+  //background-color: $inner-color;
+  width: $inner-width;
+  height: $inner-height;
+  margin-left: $sidebar-width;
+  overflow: hidden;
+}
+
+.xy-header-top {
+  position: relative;
+  //height: $header-height;
+  z-index: 1;
+}
+
+.xy-header-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: $sidebar-width;
+}
+
+.xy-corner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: $sidebar-width;
+  z-index: 1;
+}
+
+.xy-content {
+  cursor: move;
+  position: relative;
+  left: 0;
+  top: 0;
+}
+
+.xy-scroll {
+  background-color: $scroll-bar-color;
+  background-color: $scroll-bar-rgba;
+  box-sizing: border-box;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.xy-scroll-x {
+  padding-left: $sidebar-width;
+  height: $scroll-bar-size;
+  width: 100%;
+}
+
+.xy-scroll-y {
+  padding-top: $header-height;
+  width: $scroll-bar-size;
+  height: 100%;
+}
+
+.xy-bar {
+  background-color: $bar-color;
+  background-color: $bar-rgba;
+  border-radius: $bar-radius;
+  cursor: pointer;
+  position: relative;
+  transition: opacity .3s ease-in-out;
+}
+
+.xy-bar-x {
+  height: $scroll-bar-size;
+  width: 100px;
+  bottom: 0;
+  left: 0;
+}
+
+.xy-bar-y {
+  width: $scroll-bar-size;
+  height: 50px;
+  top: 50px;
+}
