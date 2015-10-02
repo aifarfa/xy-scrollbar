@@ -7,7 +7,9 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             dragX: '=?',
             dragY: '=?'
         },
-        template: '<div class="xy-outer"><div class="xy-inner" ng-transclude></div>' + '<div class="xy-scroll xy-scroll-x"><div class="xy-bar xy-bar-x" ng-style="scrollX" ng-mousedown="beginDragX($event)"></div></div>' + '<div class="xy-scroll xy-scroll-y"><div class="xy-bar xy-bar-y" ng-style="scrollY" ng-mousedown="beginDragY($event)"></div></div></div>',
+        template: '<div class="xy-outer"><div class="xy-inner" ng-transclude></div>' 
+        + '<div class="xy-scroll xy-scroll-x"><div class="xy-bar xy-bar-x" ng-style="scrollX" ng-mousedown="beginDragX($event)"></div></div>' 
+        + '<div class="xy-scroll xy-scroll-y" ng-style="{paddingTop: topOffset}"><div class="xy-bar xy-bar-y" ng-style="scrollY" ng-mousedown="beginDragY($event)"></div></div></div>',
         transclude: true,
         link: function(scope, element, attrs) {
             // ...
@@ -23,6 +25,7 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             var content = element.find('.xy-content'),
                 header = element.find('.xy-header-left'),
                 top = element.find('.xy-header-top'),
+                corner = element.find('.xy-corner'),
                 child = content.children();
 
             scope.scrollX = {
@@ -37,6 +40,8 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
                 opacity: 1
             };
 
+            scope.topOffset = 0;
+
             $timeout(function() {
                 setup();
                 resize();
@@ -45,7 +50,7 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             function setup() {
                 //config.dragHorizontal = scope.dragX; // attrs['dragX'];
                 //config.dragVertical = scope.dragY; // attrs['dragY'];
-                child.on('mousewheel', mousewheel);
+                child.on('mousewheel wheel', mousewheel);
 
                 if (scope.dragX || scope.dragY) {
                     content.on('mousedown', mousedown);
@@ -61,7 +66,7 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
                 if (event.originalEvent != undefined) {
                     event = event.originalEvent;
                 }
-                var delta = event.wheelDeltaY || event.wheelDelta;
+                var delta = getWheelDelta(event); // event.wheelDeltaY || event.wheelDelta;
                 delta = Math.floor(delta * accelerate());
                 // shift or cmd(Mac) is pressed?
                 if (event.shiftKey || event.metaKey) {
@@ -70,6 +75,16 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
                     moveY(-delta);
                 }
                 update();
+            }
+
+            function getWheelDelta(event) {
+                if (event.type == "wheel" || event.deltaY) {
+                    var delta = event.deltaX || event.deltaY;
+                    return (event.deltaMode == 0) ? -delta : -delta * 40; //line mode
+                }
+                if (event.type == "mousewheel") {
+                    return event.wheelDeltaY || event.wheelDelta;
+                }
             }
 
             scope.beginDragX = function(event) {
@@ -144,13 +159,13 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             function mouseover(event) {
                 scope.scrollX.opacity = 1;
                 scope.scrollY.opacity = 1;
-                update();
+                scope.$apply();
             }
 
             function mouseout(event) {
                 scope.scrollX.opacity = 0.3;
                 scope.scrollY.opacity = 0.3;
-                update();
+                scope.$apply();
             }
 
             function touchstart(event) {
@@ -207,7 +222,7 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             }
 
             function scrollY() {
-                var yOffset = y + getTopOffset(); //left header
+                var yOffset = y + scope.topOffset; //left header
                 header.css({
                     top: yOffset + 'px'
                 });
@@ -246,19 +261,22 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
                 return content.children().width();
             }
 
-            function getTopOffset() {
-                return top.height();
-            }
-
             function resize() {
                 scope.scrollX.width = getScrollWidth();
                 scope.scrollY.height = getScrollHeight();
+                scope.topOffset = getTopOffset();
+                corner.height(scope.topOffset);
+                top.height(scope.topOffset);
                 update();
+            }
+
+            function getTopOffset() {
+                return Math.max(top.height(), corner.height());
             }
 
             function getBarPositionX() {
                 var viewWidth = content.width();
-                var barSize = getScrollWidth();
+                var barSize = scope.scrollX.width;
                 var max = viewWidth - barSize;
                 var xMax = maxX();
                 var ratio = -x / xMax;
@@ -267,8 +285,8 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
 
             function getBarPositionY() {
                 var height = element.height();
-                var barSize = getScrollHeight();
-                var offset = getTopOffset();
+                var barSize = scope.scrollY.height;
+                var offset = scope.topOffset;
                 var max = height - barSize - offset;
                 var yMax = maxY();
                 var ratio = -y / yMax;
@@ -278,7 +296,6 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             function getScrollWidth() {
                 var w = content.width();
                 var len = actualWidth();
-
                 return w * w / len;
             }
 

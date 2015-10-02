@@ -2,9 +2,6 @@
 #target {
   width: 640px;
 }
-#target .xy-header-top {
-  height: 37px;
-}
 #target .xy-header-top .table {
   background: #fafafa;
 }
