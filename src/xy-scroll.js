@@ -7,9 +7,7 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             dragX: '=?',
             dragY: '=?'
         },
-        template: '<div class="xy-outer"><div class="xy-inner" ng-transclude></div>' 
-        + '<div class="xy-scroll xy-scroll-x"><div class="xy-bar xy-bar-x" ng-style="scrollX" ng-mousedown="beginDragX($event)"></div></div>' 
-        + '<div class="xy-scroll xy-scroll-y" ng-style="{paddingTop: topOffset}"><div class="xy-bar xy-bar-y" ng-style="scrollY" ng-mousedown="beginDragY($event)"></div></div></div>',
+        template: '<div class="xy-outer"><div class="xy-inner" ng-transclude></div>' + '<div class="xy-scroll xy-scroll-x"><div class="xy-bar xy-bar-x" ng-style="scrollX" ng-mousedown="beginDragX($event)"></div></div>' + '<div class="xy-scroll xy-scroll-y" ng-style="{paddingTop: topOffset}"><div class="xy-bar xy-bar-y" ng-style="scrollY" ng-mousedown="beginDragY($event)"></div></div></div>',
         transclude: true,
         link: function(scope, element, attrs) {
             // ...
@@ -20,12 +18,15 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
 
             var accelerationTimer = null,
                 accelerationDelay = null,
-                speed = 0.5;
+                speed = 0.5,
+                speedX = 1,
+                speedY = 1;
 
             var content = element.find('.xy-content'),
                 header = element.find('.xy-header-left'),
                 top = element.find('.xy-header-top'),
                 corner = element.find('.xy-corner'),
+                inner = content.parent(), //element.find('.xy-inner'),
                 child = content.children();
 
             scope.scrollX = {
@@ -45,11 +46,9 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             $timeout(function() {
                 setup();
                 resize();
-            }, 1);
+            });
 
             function setup() {
-                //config.dragHorizontal = scope.dragX; // attrs['dragX'];
-                //config.dragVertical = scope.dragY; // attrs['dragY'];
                 child.on('mousewheel wheel', mousewheel);
 
                 if (scope.dragX || scope.dragY) {
@@ -58,6 +57,41 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
                 content.on('mouseover', mouseover);
                 content.on('mouseout', mouseout);
                 content.on('touchstart', touchstart); //touch test
+
+                var resizeEvent = attrs["resize"];
+                if (resizeEvent) { //optional resize via scope.$boardcast
+                    scope.$on(resizeEvent, function() {
+                        $timeout(resize, 0);
+                    });
+                }
+                var resetEvent = attrs["reset"];
+                if (resetEvent) {
+                    scope.$on(resetEvent, function() {
+                        $timeout(restart, 0);
+                    });
+                }
+            }
+
+            function resize() {
+                //top header
+                scope.topOffset = getTopOffset();
+                corner.height(scope.topOffset);
+                top.height(scope.topOffset);
+                //scrollbar
+                scope.scrollX.width = getScrollWidth();
+                scope.scrollY.height = getScrollHeight();
+                speedX = getRatioX();
+                speedY = getRatioY();
+                //set position 
+                scrollX();
+                scrollY();
+            }
+
+            function restart() {
+                x = 0;
+                y = 0;
+                scrollX();
+                scrollY();
             }
 
             function mousewheel(event) {
@@ -106,7 +140,7 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
 
                 var delta = event.pageX - startX;
                 startX += delta;
-                moveX(delta);
+                moveX(delta * speedX);
                 update();
             }
 
@@ -120,7 +154,7 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
 
                 var delta = event.pageY - startY;
                 startY += delta;
-                moveY(delta);
+                moveY(delta * speedY);
                 update();
             }
 
@@ -243,7 +277,7 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             }
 
             function maxX() {
-                var limit = actualWidth() - content.width();
+                var limit = actualWidth() - inner.width();
                 return limit;
             }
 
@@ -254,28 +288,21 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             }
 
             function actualHeight() {
-                return top.height() + content.height();
+                var h = child.height();
+                return h + scope.topOffset;
             }
 
             function actualWidth() {
-                return content.children().width();
-            }
-
-            function resize() {
-                scope.scrollX.width = getScrollWidth();
-                scope.scrollY.height = getScrollHeight();
-                scope.topOffset = getTopOffset();
-                corner.height(scope.topOffset);
-                top.height(scope.topOffset);
-                update();
+                var w = child.width();
+                return w;
             }
 
             function getTopOffset() {
-                return Math.max(top.height(), corner.height());
+                return Math.max(top.children().height(), corner.height());
             }
 
             function getBarPositionX() {
-                var viewWidth = content.width();
+                var viewWidth = inner.width();
                 var barSize = scope.scrollX.width;
                 var max = viewWidth - barSize;
                 var xMax = maxX();
@@ -294,7 +321,7 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             }
 
             function getScrollWidth() {
-                var w = content.width();
+                var w = inner.width(); //.xy-inner width
                 var len = actualWidth();
                 return w * w / len;
             }
@@ -303,6 +330,18 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
                 var h = element.height() - top.height();
                 var len = actualHeight();
                 return h * h / len;
+            }
+
+            function getRatioX() {
+                var viewLength = inner.width();
+                var actualLength = actualWidth();
+                return actualLength / viewLength;
+            }
+
+            function getRatioY() {
+                var viewLength = element.height() - top.height();
+                var actualLength = actualHeight();
+                return actualLength / viewLength;
             }
 
             function update() {
