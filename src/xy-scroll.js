@@ -7,7 +7,11 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             dragX: '=?',
             dragY: '=?'
         },
-        template: '<div class="xy-outer"><div class="xy-inner" ng-transclude></div>' + '<div class="xy-scroll xy-scroll-x"><div class="xy-bar xy-bar-x" ng-style="scrollX" ng-mousedown="beginDragX($event)"></div></div>' + '<div class="xy-scroll xy-scroll-y" ng-style="{paddingTop: topOffset}"><div class="xy-bar xy-bar-y" ng-style="scrollY" ng-mousedown="beginDragY($event)"></div></div></div>',
+        template: '<div class="xy-outer"><div class="xy-inner" ng-transclude></div>' 
+        + '<div class="xy-scroll xy-scroll-x" ng-class="{active: isActive || dragging}">'
+        + '<div class="xy-bar xy-bar-x" ng-style="scrollX" ng-mousedown="beginDragX($event)"></div></div>' 
+        + '<div class="xy-scroll xy-scroll-y" ng-class="{active: isActive || dragging}" ng-style="{paddingTop: topOffset}">'
+        + '<div class="xy-bar xy-bar-y" ng-style="scrollY" ng-mousedown="beginDragY($event)"></div></div></div>',
         transclude: true,
         link: function(scope, element, attrs) {
             // ...
@@ -29,16 +33,18 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
                 inner = content.parent(), //element.find('.xy-inner'),
                 child = content.children();
 
+            scope.dragging = false;
+            scope.isActive = false;
             scope.scrollX = {
                 left: 0,
                 width: 100,
-                opacity: 1
+                // opacity: 1
             };
 
             scope.scrollY = {
                 top: 0,
                 height: 30,
-                opacity: 1
+                // opacity: 1
             };
 
             scope.topOffset = 0;
@@ -123,14 +129,16 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
 
             scope.beginDragX = function(event) {
                 event.preventDefault();
+                scope.dragging = true;
                 startX = event.pageX;
                 $document.on('mousemove', dragX);
                 $document.one('mouseup', endDragX);
             }
 
-            scope.beginDragY = function(e) {
-                e.preventDefault();
-                startY = e.pageY;
+            scope.beginDragY = function(event) {
+                event.preventDefault();
+                scope.dragging = true;
+                startY = event.pageY;
                 $document.on('mousemove', dragY);
                 $document.one('mouseup', endDragY);
             }
@@ -144,11 +152,6 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
                 update();
             }
 
-            function endDragX(e) {
-                $document.off('mousemove', dragX);
-                $document.off('mouseup', endDragX);
-            }
-
             function dragY(event) {
                 event.preventDefault();
 
@@ -158,7 +161,16 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
                 update();
             }
 
+            function endDragX(e) {
+                scope.dragging = false;
+                scope.$apply();
+                $document.off('mousemove', dragX);
+                $document.off('mouseup', endDragX);
+            }
+
             function endDragY(e) {
+                scope.dragging = false;
+                scope.$apply();
                 $document.off('mousemove', dragY);
                 $document.off('mouseup', endDragY);
             }
@@ -166,6 +178,7 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             function mousedown(event) {
                 // Prevent default dragging of selected content
                 event.preventDefault();
+                scope.dragging = true;
                 startX = event.pageX - x;
                 startY = event.pageY - y;
                 $document.on('mousemove', mousemove);
@@ -186,19 +199,19 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             }
 
             function mouseup() {
+                scope.dragging = false;
+                scope.$apply();
                 $document.off('mousemove', mousemove);
                 $document.off('mouseup', mouseup);
             }
 
             function mouseover(event) {
-                scope.scrollX.opacity = 1;
-                scope.scrollY.opacity = 1;
+                scope.isActive = true;
                 scope.$apply();
             }
 
             function mouseout(event) {
-                scope.scrollX.opacity = 0.3;
-                scope.scrollY.opacity = 0.3;
+                scope.isActive = false;
                 scope.$apply();
             }
 

@@ -1,9 +1,7 @@
-$header-height: 37px;
 $sidebar-width: 25%;
 $inner-width: 75%;
 $inner-height: 250px;
 $scroll-bar-size: 5px;
-$outer-width: 640px;
 $scroll-bar-color: #000;
 $scroll-bar-rgba: rgba(0, 0, 0, 0);
 $bar-color: #aaa;
@@ -14,11 +12,9 @@ $bar-radius: 2px;
   position: relative;
   overflow-x: hidden;
   overflow-y: hidden;
-  //width: $outer-width;
 }
 
 .xy-inner {
-  //background-color: $inner-color;
   width: $inner-width;
   height: $inner-height;
   margin-left: $sidebar-width;
@@ -27,7 +23,6 @@ $bar-radius: 2px;
 
 .xy-header-top {
   position: relative;
-  //height: $header-height;
   z-index: 1;
 }
 
@@ -69,7 +64,7 @@ $bar-radius: 2px;
 }
 
 .xy-scroll-y {
-  padding-top: $header-height;
+  //padding-top: $header-height;
   width: $scroll-bar-size;
   height: 100%;
 }
@@ -80,7 +75,12 @@ $bar-radius: 2px;
   border-radius: $bar-radius;
   cursor: pointer;
   position: relative;
+  opacity: 0.3;
   transition: opacity .3s ease-in-out;
+  
+  .active & {
+    opacity: 1;
+  }
 }
 
 .xy-bar-x {
