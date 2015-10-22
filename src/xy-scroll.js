@@ -7,11 +7,7 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             dragX: '=?',
             dragY: '=?'
         },
-        template: '<div class="xy-outer"><div class="xy-inner" ng-transclude></div>' 
-        + '<div class="xy-scroll xy-scroll-x" ng-class="{active: isActive || dragging}">'
-        + '<div class="xy-bar xy-bar-x" ng-style="scrollX" ng-mousedown="beginDragX($event)"></div></div>' 
-        + '<div class="xy-scroll xy-scroll-y" ng-class="{active: isActive || dragging}" ng-style="{paddingTop: topOffset}">'
-        + '<div class="xy-bar xy-bar-y" ng-style="scrollY" ng-mousedown="beginDragY($event)"></div></div></div>',
+        template: '<div class="xy-outer"><div class="xy-inner" ng-transclude></div>' + '<div class="xy-scroll xy-scroll-x" ng-class="{active: isActive || dragging}">' + '<div class="xy-bar xy-bar-x" ng-style="scrollX" ng-mousedown="beginDragX($event)"></div></div>' + '<div class="xy-scroll xy-scroll-y" ng-class="{active: isActive || dragging}" ng-style="{paddingTop: topOffset}">' + '<div class="xy-bar xy-bar-y" ng-style="scrollY" ng-mousedown="beginDragY($event)"></div></div></div>',
         transclude: true,
         link: function(scope, element, attrs) {
             // ...
@@ -55,7 +51,7 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             });
 
             function setup() {
-                child.on('mousewheel wheel', mousewheel);
+                inner.on('mousewheel wheel', mousewheel);
 
                 if (scope.dragX || scope.dragY) {
                     content.on('mousedown', mousedown);
@@ -98,6 +94,7 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
                 y = 0;
                 scrollX();
                 scrollY();
+                update();
             }
 
             function mousewheel(event) {
@@ -306,8 +303,9 @@ angular.module('xyScroll').directive('xyScroll', ['$log', '$document', '$timeout
             }
 
             function actualWidth() {
+                var h = top.children().width();
                 var w = child.width();
-                return w;
+                return Math.max(h, w);
             }
 
             function getTopOffset() {

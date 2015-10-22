@@ -40,16 +40,7 @@
                     <div class="xy-header-top">
                         <table class="table fixed">
                             <colgroup>
-                                <col class="col-sm" />
-                                <col class="col-sm" />
-                                <col class="col-sm" />
-                                <col class="col-sm" />
-                                <col class="col-sm" />
-                                <col class="col-sm" />
-                                <col class="col-sm" />
-                                <col class="col-sm" />
-                                <col class="col-sm" />
-                                <col class="col-sm" />
+                                <col ng-repeat="col in ctrl.fields" class="col-sm" />
                             </colgroup>
                             <tr>
                                 <th ng-repeat="col in ctrl.fields">
@@ -61,16 +52,7 @@
                     <div class="xy-content">
                         <table class="table fixed">
                             <colgroup>
-                                <col class="col-sm" />
-                                <col class="col-sm" />
-                                <col class="col-sm" />
-                                <col class="col-sm" />
-                                <col class="col-sm" />
-                                <col class="col-sm" />
-                                <col class="col-sm" />
-                                <col class="col-sm" />
-                                <col class="col-sm" />
-                                <col class="col-sm" />
+                                <col ng-repeat="col in ctrl.fields" class="col-sm" />
                             </colgroup>
                             <tr ng-repeat="item in ctrl.stuff track by $index">
                                 <td ng-bind="item.0"></td>
@@ -83,6 +65,7 @@
                                 <td ng-bind="item.7"></td>
                                 <td ng-bind="item.8"></td>
                                 <td ng-bind="item.9"></td>
+                                <td ng-bind="item.10"></td>
                             </tr>
                         </table>
                     </div>
